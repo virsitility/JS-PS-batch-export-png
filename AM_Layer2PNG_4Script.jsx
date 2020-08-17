@@ -19,6 +19,7 @@ opts = new ExportOptionsSaveForWeb();
 opts.format = SaveDocumentType.PNG;
 opts.PNG8 = false;
 opts.quality = 100;
+var debuglog = "";
 
 var confirmV = 1//confirm ("即將另存新檔!", false, "Warning!");		 
 
@@ -127,7 +128,7 @@ function LAYR2PNG(){
 		executeAction( charIDToTypeID( "Hd  " ), desc205, DialogModes.NO );		
 	}
 	t = new Date().getTime() - t;
-	alert('end \n time: '+ t/1000 + ' sec')
+	// alert('end \n time: '+ t/1000 + ' sec')
 }
 
 
@@ -211,7 +212,8 @@ function getLayerSets() {
 			rootTemp.unshift(i);
 			//把一整組 root group 中的東西傳給 rootLsets
 			rootLsets.push(rootTemp);
-			// alert(rootTemp)	
+			// alert(rootTemp)
+			debuglog += rootTemp+"\n"	
 			rootTemp = [];
 			nested = 0;		
 			continue
@@ -229,11 +231,11 @@ function getLayerSets() {
 		}else if(layerName.split(' ')[0] == '*' ){
 			hideLayer(ref);
 			rootTemp.push(i);
-			// alert(i+", "+layerName)
+			debuglog += i+", "+layerName+"\n"
 		}else if(layerName.split(' ')[0] == '/' ){
 			hideLayer(ref);
 			rootTemp.push(i);
-			// alert(i+", "+layerName)
+			debuglog += i+", "+layerName+"\n"
 		}
 		
 		//var isLayerSet = (layerType == 'layerSectionContent') ? false : true;
