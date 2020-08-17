@@ -96,19 +96,19 @@ function LAYR2PNG(){
 				descB.putList( charIDToTypeID( "null" ), listB );
 				executeAction( charIDToTypeID( "Shw " ), descB, DialogModes.NO );
 
-				// 若前綴為 / 則以圖層名稱加入存檔路徑
+				// 若前綴為 / 則以資料夾名稱加入存檔路徑
 				if(descBn.getString(charIDToTypeID('Nm  ')).split(' ')[0] == "/"){
 					midPath = "/" + layerName;
 					layerName = getLayerNameByIndex(rootIdx);
 					// slashParents[]
 				}
 
-				saveToPNG(layerName);
+				saveToPNG(layerName,rootIdx);
 				//隱藏branch
 				executeAction( charIDToTypeID( "Hd  " ), descB, DialogModes.NO );
 			}
 		}else{
-			saveToPNG(layerName);
+			saveToPNG(layerName,rootIdx);
 		}
 		
 		//如果當前root有遮罩並crop就回復上兩動
@@ -127,11 +127,17 @@ function LAYR2PNG(){
 }
 
 
-function saveToPNG(layerName){
+function saveToPNG(layerName,rootIdx){
 	var tempPath = new Folder(savePath + midPath);
 	if(!tempPath.exists) tempPath.create();
 	// pngName = tempPath + "/"+ layerName.toLowerCase() + ".png"
-	pngName = tempPath + "/"+ layerName + ".png"
+	var groupName = getLayerNameByIndex(rootIdx);
+	if(groupName.split(' ')[0] == "/"){
+		pngName = tempPath + "/"+ groupName.split(' ')[1] + "/" + layerName + ".png"
+	} else {
+		pngName = tempPath + "/"+ layerName + ".png"
+	}
+	
 	doc.exportDocument(new File(pngName), ExportType.SAVEFORWEB, opts);
 	midPath = "";
 };
@@ -203,7 +209,6 @@ function getLayerSets() {
 			hideLayer(ref);			
 			rootTemp = [];
 			nested = 0;		
-
 		}
 		
 		//前綴偵測
