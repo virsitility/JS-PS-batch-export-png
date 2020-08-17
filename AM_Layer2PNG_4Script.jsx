@@ -130,7 +130,8 @@ function LAYR2PNG(){
 function saveToPNG(layerName){
 	var tempPath = new Folder(savePath + midPath);
 	if(!tempPath.exists) tempPath.create();
-	pngName = tempPath + "/"+ layerName.toLowerCase() + ".png"
+	// pngName = tempPath + "/"+ layerName.toLowerCase() + ".png"
+	pngName = tempPath + "/"+ layerName + ".png"
 	doc.exportDocument(new File(pngName), ExportType.SAVEFORWEB, opts);
 	midPath = "";
 };
@@ -198,13 +199,8 @@ function getLayerSets() {
 			rootTemp = [];
 			nested = 0;		
 		}else if(layerType == 'layerSectionStart' && (nested-1) == 0 && layerName.split(' ')[0] == '-' ) {
-			hideLayer(ref);
-			//結算所有效果
-			//找到 root group(i)，把當前i加到暫存陣列最前面
-			// rootTemp.unshift(i);
-			//把一整組 root group 中的東西傳給 rootLsets
-			// rootLsets.push(rootTemp);
-			// alert(rootTemp)	
+			//若遇到"資料夾開始" 且 在最外層 且 名稱前綴為 -，則將整個資料夾隱藏
+			hideLayer(ref);			
 			rootTemp = [];
 			nested = 0;		
 
