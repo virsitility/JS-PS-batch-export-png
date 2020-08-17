@@ -82,9 +82,12 @@ function LAYR2PNG(){
 			cropToSelection();
 		}		
 		
+		//若資料夾有東西則循環檢察
 		if (rootSets[i].length > 1){
 			for(j in rootSets[i]){
+				//是資料夾結尾的話就跳過
 				if(j == 0) continue;
+				//init
 				var refB = new ActionReference();
 				refB.putIndex(charIDToTypeID('Lyr '), rootSets[i][j]);
 				var descBn = executeActionGet(refB);
@@ -102,6 +105,7 @@ function LAYR2PNG(){
 					layerName = getLayerNameByIndex(rootIdx);
 					// slashParents[]
 				}
+					// alert("i = "+i+" / j = "+j+" / layername = "+layerName )
 
 				saveToPNG(layerName,rootIdx);
 				//隱藏branch
@@ -128,18 +132,23 @@ function LAYR2PNG(){
 
 
 function saveToPNG(layerName,rootIdx){
-	var tempPath = new Folder(savePath + midPath);
-	if(!tempPath.exists) tempPath.create();
 	// pngName = tempPath + "/"+ layerName.toLowerCase() + ".png"
 	var groupName = getLayerNameByIndex(rootIdx);
 	if(groupName.split(' ')[0] == "/"){
-		pngName = tempPath + "/"+ groupName.split(' ')[1] + "/" + layerName + ".png"
+		var tempPath = new Folder(savePath + "/" + groupName.split(' ')[1] + midPath);
+		// pngName = tempPath + "/"+ groupName.split(' ')[1] + "/" + layerName + ".png"
 	} else {
-		pngName = tempPath + "/"+ layerName + ".png"
+		var tempPath = new Folder(savePath + midPath);
 	}
+
+	if(!tempPath.exists) tempPath.create();
+
+	pngName = tempPath + "/"+ layerName + ".png"
+	// alert("pngName = " + pngName+"\ntempPath = "+tempPath+"\nlayerName = " +layerName)
 	
 	doc.exportDocument(new File(pngName), ExportType.SAVEFORWEB, opts);
 	midPath = "";
+	groupName = "";
 };
 
 function replaceText(From, To) {
@@ -182,6 +191,7 @@ function getLayerSets() {
 	//loop 所有圖層
 	for (i; i < count; i++) {
 		if (i == 0)	continue;	//continue 為下面不執行直接回for條件判斷
+		//init
 		ref = new ActionReference();
 		ref.putIndex(charIDToTypeID('Lyr '), i);
 		var desc = executeActionGet(ref);
@@ -194,7 +204,7 @@ function getLayerSets() {
 		//若遇到"資料夾開始" 且 在巢狀內就-1
 		else if(layerType == 'layerSectionStart' && nested > 1) nested--;
 		//若遇到"資料夾開始" 且 在最外層 且 名稱前綴不為 -
-		else if(layerType == 'layerSectionStart' && (nested-1) == 0 && layerName.split(' ')[0] != '-' ) {
+		else if(layerType == 'layerSectionStart' && (nested-1) == 0 && layerName.split(' ')[0] != '-') {
 			hideLayer(ref);
 			//結算所有效果
 			//找到 root group(i)，把當前i加到暫存陣列最前面
@@ -204,11 +214,13 @@ function getLayerSets() {
 			// alert(rootTemp)	
 			rootTemp = [];
 			nested = 0;		
-		}else if(layerType == 'layerSectionStart' && (nested-1) == 0 && layerName.split(' ')[0] == '-' ) {
+			continue
+		}else if(layerType == 'layerSectionStart' && (nested-1) == 0 && layerName.split(' ')[0] == '-' || layerName.split(' ')[0] == '/') {
 			//若遇到"資料夾開始" 且 在最外層 且 名稱前綴為 -，則將整個資料夾隱藏
 			hideLayer(ref);			
 			rootTemp = [];
 			nested = 0;		
+			continue
 		}
 		
 		//前綴偵測
@@ -217,9 +229,11 @@ function getLayerSets() {
 		}else if(layerName.split(' ')[0] == '*' ){
 			hideLayer(ref);
 			rootTemp.push(i);
+			// alert(i+", "+layerName)
 		}else if(layerName.split(' ')[0] == '/' ){
 			hideLayer(ref);
 			rootTemp.push(i);
+			// alert(i+", "+layerName)
 		}
 		
 		//var isLayerSet = (layerType == 'layerSectionContent') ? false : true;
